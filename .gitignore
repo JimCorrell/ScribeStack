@@ -1,0 +1,30 @@
+# Python cruft
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual envs
+.venv/
+env/
+venv/
+
+# OS / editor junk
+.DS_Store
+.idea/
+.vscode/
+
+# Build artifacts
+output/
+
+# Logs / temp
+logs/
+tmp/
+*.log
+
+# Local overrides (if you create them)
+config.local.yaml
+.env
+.env.*

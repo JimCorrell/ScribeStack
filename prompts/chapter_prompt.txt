@@ -1,0 +1,86 @@
+You are helping me create structured notes from a textbook chapter.
+
+I will give you the FULL TEXT of one chapter from a technical textbook.
+
+Your job:
+
+1. Read and understand the chapter.
+2. Produce a SINGLE JSON object that matches EXACTLY the schema described below.
+3. Do NOT include any explanations, Markdown, or text outside of the JSON.
+4. Every string field must be plain text without Markdown formatting (no **bold**, no # headings, no bullet symbols).
+5. Prefer Mermaid diagrams where possible, but include an ASCII fallback.
+
+JSON schema (all fields required):
+
+{
+  "book_id": "<string, short kebab-case id for the book, e.g. 'example-book'>",
+  "book_title": "<string, textbook title>",
+  "chapter_number": <integer>,
+  "chapter_title": "<string>",
+
+  "chapter_summary": "<string, 4-8 sentences, high-level summary of the chapter>",
+
+  "key_ideas": [
+    "<string, one key idea per item>",
+    "<string>"
+  ],
+
+  "key_terms": [
+    {
+      "term": "<string>",
+      "definition": "<string, 1-3 sentences>"
+    }
+  ],
+
+  "sections": [
+    {
+      "title": "<string, section title as it appears or slightly cleaned>",
+      "summary": "<string, 2-4 sentences>",
+      "bullet_points": [
+        "<string, important detail>",
+        "<string>"
+      ]
+    }
+  ],
+
+  "diagrams": [
+    {
+      "id": "<string, short kebab-case, e.g. 'widget-lifecycle'>",
+      "title": "<string>",
+      "primary_format": "<string, 'mermaid' or 'ascii'>",
+      "description": "<string, short description of what the diagram shows>",
+      "mermaid_code": "<string, valid mermaid code OR empty string>",
+      "ascii_art": "<string, ASCII diagram OR empty string>"
+    }
+  ],
+
+  "atomic_notes": [
+    {
+      "id": "<string, short kebab-case, e.g. 'widget-definition'>",
+      "title": "<string, note title>",
+      "summary": "<string, 2-4 sentence summary of the concept>",
+      "details": "<string, deeper explanation with examples>",
+      "related_terms": [
+        "<string, term from key_terms or topic name>",
+        "<string>"
+      ]
+    }
+  ]
+}
+
+Constraints:
+
+- "primary_format" must be "mermaid" when a flow, hierarchy, or graph can be naturally expressed as a Mermaid diagram. Use "ascii" only when Mermaid is not a good fit.
+- If "primary_format" is "mermaid", you MUST provide non-empty "mermaid_code". "ascii_art" may be empty.
+- If "primary_format" is "ascii", you MUST provide non-empty "ascii_art". "mermaid_code" may be empty.
+- Use 3-7 key ideas.
+- Use 5-20 key terms depending on chapter depth.
+- Use 3-12 sections depending on the chapter structure.
+- Use 1-5 diagrams per chapter.
+- Use 5-15 atomic_notes per chapter, focusing on the most important concepts only.
+
+Return ONLY the JSON.
+
+Here is the chapter text:
+
+{{CHAPTER_TEXT}}
