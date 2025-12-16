@@ -10,6 +10,11 @@ Your job:
 4. Every string field must be plain text without Markdown formatting (no **bold**, no # headings, no bullet symbols).
 5. Prefer Mermaid diagrams where possible, but include an ASCII fallback.
 
+Critical constraints:
+- Use ONLY information that appears explicitly in the chapter text below. Do not invent, infer, or hallucinate content.
+- If the chapter lacks enough information for a field, provide a conservative, valid minimal value (e.g., empty arrays; for missing titles use "Untitled Chapter").
+- Keep terminology faithful to the chapter; avoid generic publishing boilerplate unless present in the chapter text.
+
 JSON schema (all fields required):
 
 {

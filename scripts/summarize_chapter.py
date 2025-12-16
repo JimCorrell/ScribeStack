@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import json
-import os
 import sys
+import time
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
 from openai import OpenAI
+from openai import RateLimitError
 
 # Load environment variables from .env file
 load_dotenv()
@@ -41,21 +42,41 @@ def summarize_chapter(
 
     prompt = prompt_template.replace("{{CHAPTER_TEXT}}", chapter_text)
 
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant that outputs ONLY valid JSON objects.",
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        temperature=0.2,
-    )
+    # Basic retry/backoff for rate limits
+    def call_with_backoff(max_retries: int = 5, base_delay: float = 5.0):
+        for attempt in range(max_retries):
+            try:
+                return client.chat.completions.create(
+                    model=model,
+                    response_format={"type": "json_object"},
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are a meticulous note-taking assistant. "
+                                "You must use ONLY information explicitly present in the provided chapter text. "
+                                'If a required field cannot be derived from the text, choose the most conservative, empty, or minimal valid value (e.g., empty arrays, "Untitled Chapter"). '
+                                "Output ONLY a valid JSON object conforming exactly to the requested schema."
+                            ),
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        },
+                    ],
+                    temperature=0,
+                )
+            except RateLimitError:
+                if attempt == max_retries - 1:
+                    raise
+                sleep_for = base_delay * (2**attempt) + (0.5 * attempt)
+                print(
+                    f"Rate limit hit (attempt {attempt + 1}/{max_retries}). "
+                    f"Sleeping {sleep_for:.1f}s then retrying..."
+                )
+                time.sleep(sleep_for)
+
+    response = call_with_backoff()
 
     content = response.choices[0].message.content
     data = json.loads(content)

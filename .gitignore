@@ -16,14 +16,15 @@ venv/
 .idea/
 .vscode/
 
-# Build artifacts
+# Build artifacts and generated content
 output/
+input/*/
 
 # Logs / temp
 logs/
 tmp/
 *.log
-
+ß
 # Local overrides (if you create them)
 config.local.yaml
 .env
